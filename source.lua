@@ -1821,7 +1821,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end)
 			end
 			
-			function DropdownSettings:Add(new_option)
+			function DropdownSettings:Add(new_option) new_option = tostring(new_option)
 				local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
 				DropdownOption.Name = new_option
 				DropdownOption.Title.Text = new_option
@@ -1831,6 +1831,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if DropdownSettings.CurrentOption == new_option then
 					DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 				end
+
+                table.insert(DropdownSettings.Options, new_option)
 
 				DropdownOption.BackgroundTransparency = (Dropdown.List.Visible and 0 or 1)
 				DropdownOption.UIStroke.Transparency = (Dropdown.List.Visible and 0 or 1)
@@ -1894,7 +1896,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 			
 			function DropdownSettings:Remove(option)
-				if (Dropdown.List:FindFirstChild(option)) then 
+				if (Dropdown.List:FindFirstChild(option)) then
+                    local idx = table.find(DropdownSettings.Options, option)
+                    if (idx) then 
+                        table.remove(DropdownSettings.Options, idx)
+                    end
+
 					Dropdown.List:FindFirstChild(option):Destroy()
 				end
 			end
@@ -1930,7 +1937,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 			
 			function DropdownSettings:Update(list)
 				if (list) then 
-					Dropdown.List:ClearAllChildren()
+					for i,v in ipairs(Dropdown.List:GetChildren()) do 
+                        if (v:IsA("Frame")) then 
+                            v:Destroy()
+                        end
+                    end
 					
 					DropdownSettings.Options = list
 					
